@@ -240,22 +240,7 @@ This means when a user asks *"Why did login failures happen on 12 April?"*, the 
 
 The core challenge is converting a user's free-text question (e.g., *"Why did errors spike on 12 April 2026?"*) into a valid KQL query. This is **not embedding-based retrieval** (RAG) — it is **schema-grounded prompt engineering** with a **four-phase pipeline** where every answer draws from both the AI model and Microsoft Learn:
 
-```
- User Question          Phase 1               Phase 2              Phase 2.5              Phase 3
- ─────────────  ┌────────────────────┐ ┌─────────────────┐ ┌──────────────────────┐ ┌────────────────────┐
- "Why errors on │ NL → KQL            │ │ Execute KQL     │ │ MS Learn Search      │ │ DUAL-SOURCE answer │
-  12 April?"   │ Translation         │ │ against Log     │ │ (ALWAYS runs)        │ │                    │
-               │                     │ │ Analytics       │ │                      │ │ Source 1: AI model │
-     ────────▶ │ Schema + few-shot   │▶│                 │▶│ Search from question │▶│  knowledge         │
-               │ GPT-4o → KQL        │ │ azure-monitor-  │ │ Search from errors   │ │ Source 2: MS Learn │
-               │                     │ │ query SDK       │ │ Return doc snippets  │ │  docs + URLs       │
-               └────────────────────┘ └─────────────────┘ └──────────────────────┘ └────────────────────┘
-                                                                                           │
-                                                                                    ▼
-                                                                          Chat response with
-                                                                          doc citations shown
-                                                                          in Streamlit
-```
+![Pipeline diagram](pipeline.png)
 
 #### Phase 1 — Schema-Grounded KQL Generation
 
