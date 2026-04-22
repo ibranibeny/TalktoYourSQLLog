@@ -100,51 +100,7 @@ Contoso deploys the Streamlit front-end on a **Linux App Service Plan (B1 SKU)**
 
 The solution spans two Azure regions to balance data residency with AI model availability:
 
-```
- ┌────────────────────────────────────────────────────────────────────────┐
- │                      SOUTHEAST ASIA REGION                            │
- │                                                                        │
- │   ┌────────────────────┐        ┌─────────────────────────────────┐   │
- │   │  Azure VM           │  AMA   │  Log Analytics Workspace        │   │
- │   │  Windows Server 2022│───────▶│  ┌───────────────────────────┐  │   │
- │   │  SQL Server Express │  DCR   │  │ Event table               │  │   │
- │   │                     │        │  │  - SQL error logs          │  │   │
- │   │  NSG: inbound rules │        │  │  - Application events      │  │   │
- │   └────────────────────┘        │  │  - System events           │  │   │
- │           ▲                      │  ├───────────────────────────┤  │   │
- │           │ RDP / Health check   │  │ Perf table                │  │   │
- │           │                      │  │  - CPU / Memory / Disk    │  │   │
- │   ┌───────┴────────────────┐    │  │  - SQL Connections         │  │   │
- │   │  Data Collection       │    │  │  - Batch Requests/sec     │  │   │
- │   │  Endpoint (DCE)        │    │  └───────────────────────────┘  │   │
- │   └────────────────────────┘    └──────────────┬──────────────────┘   │
- │                                                  │                      │
- │   ┌────────────────────────────┐                │ KQL queries via     │
- │   │  Azure App Service (Linux) │◀───────────────┘ azure-monitor-query │
- │   │  Python 3.11 + Streamlit   │                                      │
- │   │  "Talk to Your SQL Logs"   │◀─────────────────────┐               │
- │   └────────────────────────────┘                      │               │
- │                                                        │               │
- └────────────────────────────────────────────────────────┼───────────────┘
-                                                          │
-                  ┌───────────────────────────────────────┼───────────────┐
-                  │                EAST US REGION          │               │
-                  │                                        │               │
-                  │   ┌──────────────────────────────┐    │               │
-                  │   │  Azure OpenAI Service         │────┘               │
-                  │   │  Model: GPT-4o                │  Managed Identity  │
-                  │   │  Deployment: gpt-4o           │  (no API keys)     │
-                  │   └──────────┬───────────────────┘                    │
-                  │              │                                          │
-                  │   ┌──────────▼───────────────────┐                    │
-                  │   │  Azure AI Foundry             │                    │
-                  │   │  Hub: ai-hub-contoso          │                    │
-                  │   │  Project: ai-proj-sqllogs     │                    │
-                  │   │  Connection: → Azure OpenAI   │                    │
-                  │   └──────────────────────────────┘                    │
-                  │                                                        │
-                  └────────────────────────────────────────────────────────┘
-```
+![Architecture diagram](architecture.png)
 
 ### Data Flow
 
